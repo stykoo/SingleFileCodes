@@ -1,0 +1,30 @@
+CC=gcc
+
+MKLLIBDIR=/usr/lib/x86_64-linux-gnu/
+MKL_CFLAGS=-DMKL_ILP64 -m64 -I/usr/include/mkl
+MKL_LDFLAGS=-Wl,--start-group $(MKLLIBDIR)/libmkl_intel_ilp64.a $(MKLLIBDIR)/libmkl_sequential.a $(MKLLIBDIR)/libmkl_core.a -Wl,--end-group -lm -ldl
+MPI_CFLAGS=$(shell mpicc --showme:compile)
+MPI_LDFLAGS=$(shell mpicc --showme:link)
+
+CFLAGS=-m64 -Ofast -flto -march=native -funroll-loops $(MKL_CFLAGS) $(MPI_CFLAGS)
+LDFLAGS=-lpthread -lm -ldl $(MKL_LDFLAGS) $(MPI_LDFLAGS)
+EXEC=SEP
+
+all: $(EXEC)
+
+$(EXEC): main_mpi.o simul.o
+		$(CC) -o $@ $^ $(LDFLAGS)
+
+main_mpi.o: main_mpi.c simul.h
+		$(CC) -o $@ -c $< $(CFLAGS)
+
+simul.o: simul.c simul.h
+		$(CC) -o $@ -c $< $(CFLAGS)
+
+.PHONY: clean mrproper
+
+clean:
+		rm -f *.o
+
+mrproper: clean
+		rm -rf $(EXEC)
