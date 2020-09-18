@@ -1,0 +1,29 @@
+CC=g++
+
+MKLLIBDIR=/usr/lib/x86_64-linux-gnu/
+MKL_CFLAGS=-DMKL_ILP64 -m64 -I/usr/include/mkl
+MKL_LDFLAGS=-Wl,--start-group $(MKLLIBDIR)/libmkl_intel_ilp64.a $(MKLLIBDIR)/libmkl_sequential.a $(MKLLIBDIR)/libmkl_core.a -Wl,--end-group -lm -ldl
+CFLAGS=-g -W -Wall -Ofast -march=native $(MKL_CFLAGS) 
+LDFLAGS=-g -lboost_program_options -lpthread $(MKL_LDFLAGS)
+EXEC=SEP_N
+SRC=$(wildcard *.cpp)
+OBJ=$(SRC:.cpp=.o)
+
+all: $(EXEC)
+
+$(EXEC): $(OBJ)
+	$(CC) -o $@ $^ $(LDFLAGS)
+
+main.o: main.cpp
+	$(CC) -o $@ -c $< $(CFLAGS)
+
+%.o: %.cpp %.h parameters.h
+	$(CC) -o $@ -c $< $(CFLAGS)
+
+.PHONY: clean mrproper
+
+clean:
+		rm -f *.o
+
+mrproper: clean
+		rm -rf $(EXEC)
