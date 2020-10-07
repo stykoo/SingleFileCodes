@@ -7,12 +7,12 @@ MKLLIBDIR=/usr/lib/x86_64-linux-gnu/
 MKL_CFLAGS=-DMKL_ILP64 -m64 -I/usr/include/mkl
 MKL_LDFLAGS=-Wl,--start-group $(MKLLIBDIR)/libmkl_intel_ilp64.a $(MKLLIBDIR)/libmkl_sequential.a $(MKLLIBDIR)/libmkl_core.a -Wl,--end-group -lm -ldl
 
-# Custom installation in /opt/aponcet/intel/ (on gambit)
-#MKLROOT=/opt/aponcet/intel/system_studio_2018/compilers_and_libraries_2018.2.199/linux/mkl/
+# Custom installation in /home/lptl/intel/ (on gambit)
+#MKLROOT=/home/lptl/intel/system_studio_2018/compilers_and_libraries_2018.2.199/linux/mkl/
 # Or custom installation in /opt/intel-18/ (on ponyo or chihiro)
 #MKLROOT=/opt/intel-18/compilers_and_libraries/linux/mkl/
 #MKL_CFLAGS=-DMKL_ILP64 -m64 -I${MKLROOT}/include
-#MKL_LDFLAGS=-Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_intel_ilp64.a ${MKLROOT}/lib/intel64/libmkl_sequential.a ${MKLROOT}/lib/intel64/libmkl_core.a -Wl,--end-group
+#MKL_LDFLAGS=-Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_intel_ilp64.a ${MKLROOT}/lib/intel64/libmkl_sequential.a ${MKLROOT}/lib/intel64/libmkl_core.a -Wl,--end-group -lm -ldl
 ### END MKL ###
 
 CC=g++
