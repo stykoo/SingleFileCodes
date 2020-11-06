@@ -1,3 +1,4 @@
+#include <cmath>
 #include <map>
 #include <algorithm>
 #include <chrono>
@@ -31,6 +32,54 @@ void State::init(const Parameters &p, VSLStreamStatePtr stream) {
 		}
 	}
 
+}
+
+void State::init_determ(const Parameters &p) {
+	positions.clear();
+	occupations.assign(p.nbSites, 0);
+
+	long mid = p.nbSites / 2;
+	pos_tp = mid;
+	occupations[mid] = 1;
+
+	long l;
+
+	nbParts = 0;
+	if (p.rhoM <= 0.5) {
+		l = (long) (1. / p.rhoM);
+		for (long i = mid-l ; i>=0 ; i-=l) {
+			occupations[i] = 1;
+			positions.push_front(i);
+			nbParts++;
+		}
+	} else {
+		l = (long) std::round(1. / (1. - p.rhoM));
+		for (long i = mid-1 ; i>=0 ; --i) {
+			if ((mid-i) % l != 0) {
+				occupations[i] = 1;
+				positions.push_front(i);
+				nbParts++;
+			}
+		}
+	}
+
+	if (p.rhoP <= 0.5) {
+		l = (long) (1. / p.rhoP);
+		for (long i = mid+l ; i<p.nbSites ; i+=l) {
+			occupations[i] = 1;
+			positions.push_back(i);
+			nbParts++;
+		}
+	} else {
+		l = (long) std::round(1. / (1. - p.rhoP));
+		for (long i = mid+1 ; i<p.nbSites ; ++i) {
+			if ((i-mid) % l != 0) {
+				occupations[i] = 1;
+				positions.push_back(i);
+				nbParts++;
+			}
+		}
+	}
 }
 
 double State::update(const Parameters &p, double u, VSLStreamStatePtr stream) {

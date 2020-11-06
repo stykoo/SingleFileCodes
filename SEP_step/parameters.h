@@ -25,6 +25,7 @@ struct Parameters {
 	double duration;  // Duration of the simulation
 	double dt;  // Timestep for export of observables
 	long nbSteps;  // This is duration / dt
+	bool determ; // Use deterministic initial conditions
 
 	long nbSimuls;  // Number of simulations
 	int nbThreads;  // Number of threads

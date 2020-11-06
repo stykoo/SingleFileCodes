@@ -37,6 +37,22 @@ int Parameters::check() const {
 			<< std::endl;
 		return 1;
 	}
+	if (determ) {
+		if ((rhoM <= 0.5 && std::floor(1/rhoM) != 1/rhoM)
+			|| (rhoM > 0.5 &&
+				std::abs(std::round(1/(1-rhoM))-1/(1-rhoM)) > 1e-6)) {
+			std::cerr << "Error: 1/rhoM or 1/(1-rhoM) should be an integer"
+				<< std::endl;
+			return 1;
+		}
+		if ((rhoP <= 0.5 && std::floor(1/rhoP) != 1/rhoP)
+			|| (rhoP > 0.5 &&
+				std::abs(std::round(1/(1-rhoP))-1/(1-rhoP)) > 1e-6)) {
+			std::cerr << "Error: 1/rhoP or 1/(1-rhoP) should be an integer"
+				<< std::endl;
+			return 1;
+		}
+	}
 	return 0;
 }
 
@@ -56,6 +72,8 @@ int Parameters::fromCommandLine(int argc, char **argv) {
 		 "Duration of the simulation")
 		("dt,t", po::value<double>(&dt)->required(),
 		 "Timestep for export")
+        ("determ", po::bool_switch(&determ),
+		 "Deterministic initial conditions")
 		("simuls,s", po::value<long>(&nbSimuls)->required(),
 		 "Number of repetitions of the simulation")
 		("threads,c", po::value<int>(&nbThreads)->default_value(

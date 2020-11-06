@@ -85,15 +85,16 @@ void runOneSimulation(const Parameters &p, ObservablesVec &obs,
 	// To generate the time
 	double t = 0., tLast = 0.;
 	long tDiscrete = 0;
-	//double scalet = 1.0 / p.nbParticles;
-	//double times[BATCH_SIZE];
-	//int indices[BATCH_SIZE];
 	double dt;
 	double us[BATCH_SIZE];
 
-	// Positions of the tracers
+	// Initialization
 	State state;
-	state.init(p, stream);
+	if (p.determ) {
+		state.init_determ(p);
+	} else {
+		state.init(p, stream);
+	}
 	const State initialState = state;
 
 	// Compute the initial observables
@@ -107,10 +108,6 @@ void runOneSimulation(const Parameters &p, ObservablesVec &obs,
 	// Loop over time
 	// Generation of the random numbers in batches
 	while (tDiscrete < p.nbSteps) {
-		//vdRngExponential(VSL_RNG_METHOD_EXPONENTIAL_ICDF, stream, BATCH_SIZE,
-		//		         times, 0.0, scalet);
-		//viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream, BATCH_SIZE, indices,
-		//			 0, p.nbParticles);
 		vdRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream, BATCH_SIZE, us,
 				     0.0, 1.0);
 
