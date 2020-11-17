@@ -90,6 +90,7 @@ double State::update(const Parameters &p, double u, VSLStreamStatePtr stream) {
 				 0, nbParts+3);
 	vdRngExponential(VSL_RNG_METHOD_EXPONENTIAL_ICDF, stream, 1,
 			         &dt, 0.0, 1./(nbParts+3));
+	//std::cout << part << " / " << nbParts << ", dt=" << dt << "\n";
 
 	if (part < nbParts) {
 		// Bath particles
@@ -123,9 +124,9 @@ double State::update(const Parameters &p, double u, VSLStreamStatePtr stream) {
 		}
 		int o = occupations[pos_next];
 		long dpos = (1 - o) * (pos_next - pos_tp);
-		pos_tp += dpos; // Move if next site not occupied
 		occupations[pos_tp] = o; // Occupied only if doesn't move
 		occupations[pos_next] = 1; // Next site is occupied anyways
+		pos_tp += dpos; // Move if next site not occupied
 	} else if (part == nbParts+1 && u < 0.5 * p.rhoP &&
 			   !occupations[p.nbSites-1]) {
 		// Jump from right reservoir
@@ -133,6 +134,7 @@ double State::update(const Parameters &p, double u, VSLStreamStatePtr stream) {
 		positions.push_back(p.nbSites-1);
 		nbParts++;
 	} else if (u < 0.5 * p.rhoM && !occupations[0]) {
+		//std::cout << "Bip left" << "\n";
 		// Jump from left reservoir
 		occupations[0] = 1;
 		positions.push_front(0);
@@ -160,7 +162,8 @@ void State::visualize(const Parameters &p, const double t) {
 			std::cout << '.';
 		}
 	}
-	std::cout << std::fixed << std::setprecision(5) <<  "  (t = " << t << ")"
+	std::cout << std::fixed << std::setprecision(5) <<  "  (t = " << t <<
+		", " << nbParts << " particles)"
 		<< std::flush;
 	
 	// Sleep

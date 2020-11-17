@@ -105,6 +105,7 @@ void runOneSimulation(const Parameters &p, ObservablesVec &obs,
 		state.visualize(p, 0.);
 	}
 
+
 	// Loop over time
 	// Generation of the random numbers in batches
 	while (tDiscrete < p.nbSteps) {
@@ -120,12 +121,16 @@ void runOneSimulation(const Parameters &p, ObservablesVec &obs,
 				obs[tDiscrete].fromState(state, initialState);
 				++tDiscrete;
 				tLast += p.dt;
+				if (tDiscrete >= p.nbSteps)
+					goto endloop;
 			}
 			if (p.visu) {
 				state.visualize(p, t);
 			}
 		}
 	}
+endloop:
+	std::cout << "";
 }
 
 // Export the observables to a file.
