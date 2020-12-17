@@ -29,44 +29,20 @@ void Observables::compute(const double dx, const std::vector<double> &dpos,
 		for (long i = 0 ; i < nbMoments ; ++i) {
 			for (long j = 0 ; j < nbPointsProf ; ++j) {
 				profiles[i][j] = 0.0;
-			}
-		}
-
-		for (long i = 0 ; i < mid ; ++i) {
-			//assert(dpos[i] <= 0.);
-			if (-dpos[i] < lenProf) {
-				int k = (int) (-dpos[i] * nbPointsProf / lenProf);
-				nM += (k == 0);
-				double u = 1;
-				for (long j = 0 ; j < nbMoments ; ++j) {
-					profiles[j][k] += u;
-					u *= -dx;
+				if (computeCorrel) {
+					correlsP[i][j] = 0.0;
+					correlsM[i][j] = 0.0;
 				}
 			}
 		}
-		for (long i = mid + 1 ; i < n_parts ; ++i) {
-			//assert(dpos[i] >= 0.);
-			if (dpos[i] < lenProf) {
-				int k = (int) (dpos[i] * nbPointsProf / lenProf);
-				nP += (k == 0);
-				double u = 1;
-				for (long j = 0 ; j < nbMoments ; ++j) {
-					profiles[j][k] += u;
-					u *= dx;
-				}
-			}
-		}
-	}
 
-	//std::cout << "nm " << nM << ", np " << nP << "\n";
-
-	// Correlations
-	if (computeCorrel) {
-		for (long i = 0 ; i < nbMoments ; ++i) {
-			for (long j = 0 ; j < nbPointsProf ; ++j) {
-				correlsP[i][j] = 0.0;
-				correlsM[i][j] = 0.0;
-			}
+		if (computeCorrel) {
+			for (long i = 0 ; i < mid ; ++i)
+				if (-dpos[i] * nbPointsProf < lenProf)
+					nM++;
+			for (long i = mid + 1 ; i < n_parts ; ++i)
+				if (dpos[i] * nbPointsProf < lenProf)
+					nP++;
 		}
 
 		for (long i = 0 ; i < mid ; ++i) {
@@ -74,8 +50,11 @@ void Observables::compute(const double dx, const std::vector<double> &dpos,
 				int k = (int) (-dpos[i] * nbPointsProf / lenProf);
 				double u = 1;
 				for (long j = 0 ; j < nbMoments ; ++j) {
-					correlsP[j][k] += nM * u;
-					correlsM[j][k] += nP * u;
+					profiles[j][k] += u;
+					if (computeCorrel) {
+						correlsP[j][k] += nM * u;
+						correlsM[j][k] += nP * u;
+					}
 					u *= -dx;
 				}
 			}
@@ -85,8 +64,11 @@ void Observables::compute(const double dx, const std::vector<double> &dpos,
 				int k = (int) (dpos[i] * nbPointsProf / lenProf);
 				double u = 1;
 				for (long j = 0 ; j < nbMoments ; ++j) {
-					correlsP[j][k] += nP * u;
-					correlsM[j][k] += nM * u;
+					profiles[j][k] += u;
+					if (computeCorrel) {
+						correlsP[j][k] += nP * u;
+						correlsM[j][k] += nM * u;
+					}
 					u *= dx;
 				}
 			}
