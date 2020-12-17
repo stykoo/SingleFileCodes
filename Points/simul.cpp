@@ -15,7 +15,7 @@ int runSimulations(const Parameters &p) {
 	std::vector< Observables >
 		allSumsObs(p.nbThreads,
 				   Observables(DEFAULT_N_MOMENTS, p.lenProf, p.nbPtsProf,
-					           p.export_prof));
+					           p.export_prof, p.export_correl));
 
 	long nbSimulsPerThread = p.nbSimuls / p.nbThreads;
 	
@@ -37,7 +37,8 @@ int runSimulations(const Parameters &p) {
 	}
 
 	// Initialize the total sum
-	Observables sumObs(DEFAULT_N_MOMENTS, p.lenProf, p.nbPtsProf, p.export_prof);
+	Observables sumObs(DEFAULT_N_MOMENTS, p.lenProf, p.nbPtsProf, p.export_prof,
+			           p.export_correl);
 
 	// Add the observables to the total sum
 	for (int k = 0 ; k < p.nbThreads ; ++k) {
@@ -48,6 +49,8 @@ int runSimulations(const Parameters &p) {
 	status = exportObservables(sumObs, p);
 	if (!status && p.export_prof)
 		status = exportProfiles(sumObs, p);	
+	if (!status && p.export_correl)
+		status = exportCorrels(sumObs, p);	
 	return status;
 }
 
@@ -59,7 +62,8 @@ void runMultipleSimulations(const Parameters &p, const long nbSimuls,
 	VSLStreamStatePtr stream;
 	vslNewStream(&stream, CUSTOM_RNG, seed);
 
-	Observables obs(DEFAULT_N_MOMENTS, p.lenProf, p.nbPtsProf, p.export_prof);
+	Observables obs(DEFAULT_N_MOMENTS, p.lenProf, p.nbPtsProf, p.export_prof,
+			        p.export_correl);
 
 	for (long s = 0 ; s < nbSimuls ; ++s) {
 		if (p.verbose) {
@@ -157,7 +161,7 @@ int exportProfiles(const Observables &sumObs, const Parameters &p) {
 	}
 
 	// Header
-	file << "# RAP_Profiles (" << __DATE__ <<  ", " << __TIME__ << "): ";
+	file << "# Points_Profiles (" << __DATE__ <<  ", " << __TIME__ << "): ";
 	p.print(file);
 	file << "\n# x";
 	for (size_t i = 0 ; i < DEFAULT_N_MOMENTS ; ++i) {
@@ -174,6 +178,56 @@ int exportProfiles(const Observables &sumObs, const Parameters &p) {
 	}
 
 	file.close();
+
+	return 0;
+}
+
+int exportCorrels(const Observables &sumObs, const Parameters &p) {
+	double fac = p.lenProf / p.nbPtsProf;
+	double fac2 = fac * fac;
+	std::string fname;
+   
+	fname = p.output + "_correlP.dat";
+	std::ofstream file(fname);
+	if (!file.is_open())
+		return 1;
+	file << "# Points_CorrelsP (" << __DATE__ <<  ", " << __TIME__ << "): ";
+	p.print(file);
+	file << "\n# x";
+	for (size_t i = 0 ; i < DEFAULT_N_MOMENTS ; ++i) {
+		file << " rho(0+)*rho(x)*X^" << i;
+	}
+	file << "\n";
+	for (long j = 0 ; j < p.nbPtsProf ; ++j) {
+		file << j * fac;
+		for (size_t k = 0 ; k < DEFAULT_N_MOMENTS ; ++k) {
+			// Factor 2 because of symmetrization
+			file << " " << sumObs.getCorrelsP(k, j) / fac2 / p.nbSimuls / 2;
+		}
+		file << "\n";
+	}
+	file.close();
+
+	fname = p.output + "_correlM.dat";
+	std::ofstream file2(fname);
+	if (!file2.is_open())
+		return 1;
+	file2 << "# Points_CorrelsM (" << __DATE__ <<  ", " << __TIME__ << "): ";
+	p.print(file2);
+	file2 << "\n# x";
+	for (size_t i = 0 ; i < DEFAULT_N_MOMENTS ; ++i) {
+		file2 << " rho(0-)*rho(x)*X^" << i;
+	}
+	file2 << "\n";
+	for (long j = 0 ; j < p.nbPtsProf ; ++j) {
+		file2 << j * fac;
+		for (size_t k = 0 ; k < DEFAULT_N_MOMENTS ; ++k) {
+			// Factor 2 because of symmetrization
+			file2 << " " << sumObs.getCorrelsM(k, j) / fac2 / p.nbSimuls / 2;
+		}
+		file2 << "\n";
+	}
+	file2.close();
 
 	return 0;
 }

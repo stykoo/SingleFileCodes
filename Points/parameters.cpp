@@ -56,6 +56,7 @@ int Parameters::fromCommandLine(int argc, char **argv) {
         ("determ,d", po::bool_switch(&determ),
 		 "Deterministic initial conditions")
         ("prof", po::bool_switch(&export_prof), "Export the profiles")
+        ("correl", po::bool_switch(&export_correl), "Export the profiles")
         ("verbose,v", po::bool_switch(&verbose), "Verbose mode")
         ("help,h", "Print help message and exit")
 		;

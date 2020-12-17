@@ -21,5 +21,6 @@ void runOneSimulation(const Parameters &p, Observables &obs,
    					  VSLStreamStatePtr stream);
 int exportObservables(const Observables &sumObs, const Parameters &p);
 int exportProfiles(const Observables &sumObs, const Parameters &p);
+int exportCorrels(const Observables &sumObs, const Parameters &p);
 
 #endif

@@ -30,6 +30,7 @@ struct Parameters {
 
 	bool determ; // Deterministic initial conditions
 	bool export_prof;  // Export the profiles
+	bool export_correl;  // Export the correlations
 	bool verbose;  // Verbose mode
 };
 
