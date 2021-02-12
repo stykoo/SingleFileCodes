@@ -19,5 +19,6 @@ void runMultipleSimulations(const Parameters &p, const long nbSimuls,
 void runOneSimulation(const Parameters &p, ObservablesVec &obs,
    					  VSLStreamStatePtr stream);
 int exportObservables(const ObservablesVec &sumObs, const Parameters &p);
+int exportProfs(const ObservablesVec &sumObs, const Parameters &p);
 
 #endif

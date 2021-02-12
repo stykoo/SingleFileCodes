@@ -74,6 +74,10 @@ int Parameters::fromCommandLine(int argc, char **argv) {
 		 "Timestep for export")
         ("determ", po::bool_switch(&determ),
 		 "Deterministic initial conditions")
+        ("prof", po::bool_switch(&computeProfs),
+		 "Compute generalized profiles")
+		("sitesProf", po::value<long>(&nbSitesProf)->default_value(0),
+		 "Number of sites for profiles")
 		("simuls,s", po::value<long>(&nbSimuls)->required(),
 		 "Number of repetitions of the simulation")
 		("threads,c", po::value<int>(&nbThreads)->default_value(
