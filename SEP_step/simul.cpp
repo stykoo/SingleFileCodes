@@ -175,11 +175,10 @@ int exportProfs(const ObservablesVec &sumObs, const Parameters &p) {
 		}
 		file << "# SF_ContTime (" << __DATE__ <<  ", " << __TIME__ << "): ";
 		p.print(file);
-		file << "\n# r";
-		for (size_t j = 0 ; j < DEFAULT_N_MOMS ; ++j) {
-			file << " e_r*x^" << j+1;
-		}
-		file << "\n";
+		file << "\n# r er e+*er e-*er";
+		file << " X*er X*e+*er X*e-*er X";
+		file << " X^2*er X^2*e+*er X^2*e-*er X^2";
+		file << " X^3*er X^3*e+*er X^3*e-*er X^3\n";
 		file << std::scientific << std::setprecision(DEFAULT_OUTPUT_PRECISION);
 		// Data (we write the average and not the sum)
 		sumObs[i].printProfsP(p.nbSimuls, file);
@@ -194,11 +193,10 @@ int exportProfs(const ObservablesVec &sumObs, const Parameters &p) {
 		}
 		file << "# SF_ContTime (" << __DATE__ <<  ", " << __TIME__ << "): ";
 		p.print(file);
-		file << "\n# r";
-		for (size_t j = 0 ; j < DEFAULT_N_MOMS ; ++j) {
-				file << " e_r*x^" << j+1;
-		}
-		file << "\n";
+		file << "\n# r er e+*er e-*er";
+		file << " X*er X*e+*er X*e-*er X";
+		file << " X^2*er X^2*e+*er X^2*e-*er X^2";
+		file << " X^3*er X^3*e+*er X^3*e-*er X^3\n";
 		file << std::scientific << std::setprecision(DEFAULT_OUTPUT_PRECISION);
 		// Data (we write the average and not the sum)
 		sumObs[i].printProfsM(p.nbSimuls, file);

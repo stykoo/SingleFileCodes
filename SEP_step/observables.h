@@ -7,6 +7,7 @@
 #include "state.h"
 
 #define DEFAULT_N_MOMS 6
+#define DEFAULT_N_OBS 15
 
 class Observables {
 	public:
