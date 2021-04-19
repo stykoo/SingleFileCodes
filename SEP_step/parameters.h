@@ -27,6 +27,7 @@ struct Parameters {
 	bool determ; // Use deterministic initial conditions
 	bool computeProfs; // Compute generalized profiles
 	long nbSitesProf; // Number of sites for profiles
+	bool rev; // Compute (1-\eta_1)\eta_r
 
 	long nbSimuls;  // Number of simulations
 	int nbThreads;  // Number of threads

@@ -1,8 +1,8 @@
 #include <cassert>
 #include "observables.h"
 
-Observables::Observables(bool computeProfs, long nbSites) :
-	computeProfs(computeProfs), nbSites(nbSites) {
+Observables::Observables(bool computeProfs, long nbSites, const bool rev) :
+	computeProfs(computeProfs), nbSites(nbSites), rev(rev) {
 	moments.assign(DEFAULT_N_MOMS, 0);
 	if (computeProfs) {
 		profilesP.assign(DEFAULT_N_OBS, std::vector<long long>(nbSites, 0));
@@ -19,8 +19,14 @@ void Observables::fromState(const State &state, const State &initialState) {
 	}
 
 	if (computeProfs) {
-		int ep = state.getOcc(X+1);
-		int em = state.getOcc(X-1);
+		int ep, em;
+		if (rev) {
+			ep = 1 - state.getOcc(X+1);
+			em = 1 - state.getOcc(X-1);
+		} else {
+			ep = state.getOcc(X+1);
+			em = state.getOcc(X-1);
+		}
 		long xPerEp = xPer * ep;
 		long xPerEm = xPer * em;
 		long xPer2 = xPer * xPer;
@@ -110,8 +116,8 @@ void Observables::printProfsM(const long N, std::ostream &stream) const {
 }
 
 ObservablesVec::ObservablesVec(const long nbIt, bool computeProfs,
-		                       long nbSites) :
-		nbIters(nbIt), obsVec(nbIt, Observables(computeProfs, nbSites)) {
+		                       long nbSites, bool rev) :
+		nbIters(nbIt), obsVec(nbIt, Observables(computeProfs, nbSites, rev)) {
 }
 
 void ObservablesVec::add(const ObservablesVec &ov) {

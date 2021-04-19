@@ -60,6 +60,10 @@ int Parameters::check() const {
 void Parameters::print(std::ostream &stream) const {
 	stream << "sites=" << nbSites << ", rhoP=" << rhoP << ", rhoM=" << rhoM
 		<< ", duration=" << duration << ", simuls=" << nbSimuls;
+	if (rev)
+		stream << ", rev";
+	if (determ)
+		stream << ", determ";
 }
 
 int Parameters::fromCommandLine(int argc, char **argv) {
@@ -78,6 +82,7 @@ int Parameters::fromCommandLine(int argc, char **argv) {
 		 "Compute generalized profiles")
 		("sitesProf", po::value<long>(&nbSitesProf)->default_value(0),
 		 "Number of sites for profiles")
+        ("rev", po::bool_switch(&rev), "Compute (1-eta_1) eta_r, etc.")
 		("simuls,s", po::value<long>(&nbSimuls)->required(),
 		 "Number of repetitions of the simulation")
 		("threads,c", po::value<int>(&nbThreads)->default_value(

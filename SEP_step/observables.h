@@ -11,7 +11,7 @@
 
 class Observables {
 	public:
-		Observables(bool computeProfs, long nbSites);
+		Observables(bool computeProfs, long nbSites, const bool rev);
 		Observables(const Observables &o) = default;
 		void fromState(const State &state, const State &initialState);
 		void add(const Observables &obs);
@@ -22,6 +22,7 @@ class Observables {
 	protected:
 		const bool computeProfs; // Compute the profiles or not
 		const long nbSites; // Number of sites
+		const bool rev; // Compute (1-\eta_1) \eta_r, etc.
 		std::vector<long long> moments;  // All the moments
 		std::vector<std::vector<long long> > profilesP; // Generalized profiles
 		std::vector<std::vector<long long> > profilesM; // Generalized profiles
@@ -29,7 +30,8 @@ class Observables {
 
 class ObservablesVec {
 	public:
-		ObservablesVec(const long nbIt, bool computeProfs, long nbSites);
+		ObservablesVec(const long nbIt, bool computeProfs, long nbSites,
+				       bool rev);
 		void add(const ObservablesVec &ov);
 		void print(const long N, std::ostream &stream=std::cout) const;
 		Observables& operator[](std::size_t idx) {
