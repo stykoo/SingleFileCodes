@@ -89,8 +89,9 @@ void runOneSimulation(const Parameters &p, ObservablesVec &obs,
 	// To generate the time
 	double t = 0., tLast = 0.;
 	long tDiscrete = 0;
-	double dt;
-	double us[BATCH_SIZE];
+	double us[BATCH_SIZE], dts[BATCH_SIZE];
+	int parts[BATCH_SIZE];
+	long nbParts;
 
 	// Initialization
 	State state;
@@ -109,17 +110,22 @@ void runOneSimulation(const Parameters &p, ObservablesVec &obs,
 		state.visualize(p, 0.);
 	}
 
-
 	// Loop over time
 	// Generation of the random numbers in batches
 	while (tDiscrete < p.nbSteps) {
+		nbParts = state.getNbParts();
 		vdRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream, BATCH_SIZE, us,
 				     0.0, 1.0);
+		// bath particles + TP + left / right reservoirs -> nbParts + 3
+		viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream, BATCH_SIZE, parts,
+					 0, nbParts+3);
+		vdRngExponential(VSL_RNG_METHOD_EXPONENTIAL_ICDF, stream, BATCH_SIZE,
+						 dts, 0.0, 1./(nbParts+3));
 
 		for (int i = 0 ; i < BATCH_SIZE ; ++i) {
 			// Evolve
-			dt = state.update(p, us[i], stream);
-			t += dt;
+			t += dts[i];
+			state.update(p, us[i], parts[i]);
 
 			while (t - tLast > p.dt && tDiscrete < p.nbSteps) {
 				obs[tDiscrete].fromState(state, initialState);
@@ -130,6 +136,10 @@ void runOneSimulation(const Parameters &p, ObservablesVec &obs,
 			}
 			if (p.visu) {
 				state.visualize(p, t);
+			}
+			// Regenerate the random numbers if number of particles changed
+			if (state.getNbParts() != nbParts) {
+				break;
 			}
 		}
 	}
