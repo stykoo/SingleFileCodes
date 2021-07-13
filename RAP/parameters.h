@@ -34,6 +34,7 @@ struct Parameters {
 
 	double probTP; // Jump probability of the TP to the right
 	bool determ; // Deterministic initial conditions
+	bool stat; // Stationary-state initial conditions
 	bool export_prof;  // Export the profiles
 	bool verbose;  // Verbose mode
 };

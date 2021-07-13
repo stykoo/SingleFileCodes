@@ -39,7 +39,8 @@ int Parameters::check() const {
 void Parameters::print(std::ostream &stream) const {
 	stream << "particles=" << nbParticles << ", duration=" << duration
 		<< ", duration_therm=" << duration_therm << ", simuls=" << nbSimuls
-		<< ", prob=" << probTP << ", determ=" << determ;
+		<< ", prob=" << probTP << ", determ=" << determ
+		<< ", stat=" << stat;
 }
 
 int Parameters::fromCommandLine(int argc, char **argv) {
@@ -67,6 +68,8 @@ int Parameters::fromCommandLine(int argc, char **argv) {
 			DEFAULT_OUTPUT_FILE), "Output file")
         ("determ,d", po::bool_switch(&determ),
 		 "Deterministic initial conditions")
+        ("stat", po::bool_switch(&stat),
+		 "Stationary state initial conditions")
         ("prof", po::bool_switch(&export_prof), "Export the profiles")
         ("verbose,v", po::bool_switch(&verbose), "Verbose mode")
         ("help,h", "Print help message and exit")

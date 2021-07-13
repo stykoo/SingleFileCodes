@@ -18,12 +18,12 @@ inline void pbcSym(T &x, const T L) {
 	x -= L * std::round(x / L);
 }
 
-
 struct State {
 	public:
 		State(const Parameters &p);
 		State(const State &s) = default;
 		void init(VSLStreamStatePtr stream);
+		void init_stat(VSLStreamStatePtr stream);
 		void init_determ();
 		void reset();
 		void update(long part, double u, int dir);
@@ -39,6 +39,7 @@ struct State {
 		double initialX; // Initial position of the TP
 		long winding; // Number of turns of the TP
 		std::vector<double> positions;  // Positions of the particles
+		std::vector<double> aux;  // Auxilliary array
 };
 
 #endif

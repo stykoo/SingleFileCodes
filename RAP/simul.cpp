@@ -100,6 +100,8 @@ void runOneSimulation(const Parameters &p, ObservablesVec &obs,
 	State state(p);
 	if (p.determ) {
 		state.init_determ();
+	} else if (p.stat) {
+		state.init_stat(stream);
 	} else {
 		state.init(stream);
 	}
