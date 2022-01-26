@@ -89,7 +89,7 @@ void State::init_determ() {
 
 void State::reset() {
 	// Initial position and initial number of turns
-	initialX = positions[0];
+	initialX = positions[0] % nbSitesX;
 	winding = 0;
 }
 
@@ -100,18 +100,24 @@ void State::update(long part, double u) {
 	long pos_next, x, y;
 	if (u < 0.5) { // Vertical motion
 		pos_next = pos + nbSitesX * (2 * (u < 0.25) - 1);
-		if (pos_next >= nbSitesTot) 
+		if (pos_next >= nbSitesTot) {
 			pos_next -= nbSitesTot;
-		if (pos_next < 0) 
+		} else if (pos_next < 0) {
 			pos_next += nbSitesTot;
+		}
 	} else { // Horizontal motion
-		x = pos % nbSitesX;
+		x = (pos % nbSitesX) + 2 * (u < 0.75) - 1;
 		y = pos / nbSitesX;
-		x += 2 * (u < 0.75) - 1;
-		if (x == nbSitesX)
+		if (x == nbSitesX) {
 			x = 0;
-		else if (x == -1)
+			if (part==0 && !occupations[y * nbSitesX]) {
+				winding++;
+			}
+		} else if (x == -1) {
 			x = nbSitesX - 1;
+			if (part==0 && !occupations[y * nbSitesX + x])
+				winding--;
+		}
 		pos_next = y * nbSitesX + x;
 	}
 
@@ -149,6 +155,7 @@ void State::visualize(const Parameters &p, const double t, const long hl) {
 		}
 		std::cout << "\n";
 	}
+	std::cout << "X=" << getXtp() << "\n";
 	std::cout << std::fixed << std::setprecision(5) <<  "(t = " << t << ")"
 		<< std::endl;
 	

@@ -16,7 +16,7 @@ struct State {
 		void update(long part, double u);
 		void visualize(const Parameters &p, const double t, const long hl=-1);
 		long getXtp() const {
-			return positions[0] - initialX + (winding * nbSitesX);
+			return (positions[0] % nbSitesX) - initialX + (winding * nbSitesX);
 		}		
 
 	protected:
