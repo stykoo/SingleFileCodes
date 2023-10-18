@@ -50,7 +50,7 @@ void State::init(VSLStreamStatePtr stream) {
 
 void State::init_determ() {
 	// Density smaller or larger than 0.5
-	if (2 * p.nbParticles < p.nbSites) {
+	if (2 * p.nbParticles <= p.nbSites) {
 		const long step = p.nbSites / p.nbParticles;
 		long u = 0;
 		for (long i = 0 ; i < p.nbSites ; ++i) {
@@ -62,7 +62,7 @@ void State::init_determ() {
 			}
 		}
 	} else {
-		const long step = (p.nbParticles - p.nbSites) / p.nbParticles;
+		const long step = p.nbSites / (p.nbSites - p.nbParticles);
 		long u = 0;
 		for (long i = 0 ; i < p.nbSites ; ++i) {
 			if (i % step == step / 2) {
