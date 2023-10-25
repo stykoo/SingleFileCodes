@@ -15,12 +15,10 @@
 
 int runSimulations(const Parameters &p);
 void runMultipleSimulations(const Parameters &p, const long nbSimuls,
-		                    Observables &sumObs,
+		                    ObservablesVec &sumObs,
 						    const unsigned int seed);
-void runOneSimulation(const Parameters &p, Observables &obs,
+void runOneSimulation(const Parameters &p, ObservablesVec &obs,
    					  VSLStreamStatePtr stream);
-int exportObservables(const Observables &sumObs, const Parameters &p);
-int exportProfiles(const Observables &sumObs, const Parameters &p);
-int exportCorrels(const Observables &sumObs, const Parameters &p);
+int exportObservables(const ObservablesVec &sumObs, const Parameters &p);
 
 #endif

@@ -4,7 +4,6 @@
 #define DEFAULT_PROBA_RIGHT 0.5
 #define DEFAULT_OUTPUT_PRECISION 15
 #define DEFAULT_OUTPUT_FILE "observables.dat"
-#define DEFAULT_CUSTOM_FILE "custom.dat"
 #define DEFAULT_THREADS 1
 #define DEFAULT_VISU_SLEEP 200
 
@@ -26,6 +25,9 @@ struct Parameters {
 	double dt;  // Timestep for export of observables
 	long nbSteps;  // This is duration / dt
 	bool determ; // Use deterministic initial conditions
+	bool computeProfs; // Compute generalized profiles
+	long nbSitesProf; // Number of sites for profiles
+	bool rev; // Compute (1-\eta_1)\eta_r
 
 	long nbSimuls;  // Number of simulations
 	int nbThreads;  // Number of threads

@@ -13,8 +13,7 @@ int runSimulations(const Parameters &p) {
 	std::vector<std::thread> threads;
 
 	std::vector< ObservablesVec >
-		allSumsObs(p.nbThreads, ObservablesVec(p.nbSteps, DEFAULT_N_MOMENTS,
-					                           p.nbPtsProf, p.export_prof));
+		allSumsObs(p.nbThreads, ObservablesVec(p.nbSteps, DEFAULT_N_MOMENTS));
 
 	long nbSimulsPerThread = p.nbSimuls / p.nbThreads;
 	
@@ -36,18 +35,14 @@ int runSimulations(const Parameters &p) {
 	}
 
 	// Initialize the total sum
-	ObservablesVec sumObs(p.nbSteps, DEFAULT_N_MOMENTS, p.nbPtsProf,
-			              p.export_prof);
+	ObservablesVec sumObs(p.nbSteps, DEFAULT_N_MOMENTS);
 
 	// Add the observables to the total sum
 	for (int k = 0 ; k < p.nbThreads ; ++k) {
 		sumObs.add(allSumsObs[k]);
 	}
 
-	int status;
-	status = exportObservables(sumObs, p);
-	if (!status && p.export_prof)
-		status = exportProfiles(sumObs, p);	
+	int status = exportObservables(sumObs, p);
 
 	return status;
 }
@@ -56,17 +51,16 @@ int runSimulations(const Parameters &p) {
 // This function is usually called as a thread.
 void runMultipleSimulations(const Parameters &p, const long nbSimuls,
 		                    ObservablesVec &sumObs,
-						   const unsigned int seed) {
+					 	    const unsigned int seed) {
     // Random generator
 	//std::mt19937 rndGen(seed);
 	VSLStreamStatePtr stream;
 	vslNewStream(&stream, CUSTOM_RNG, seed);
 
-	ObservablesVec obs(p.nbSteps, DEFAULT_N_MOMENTS, p.nbPtsProf,
-			           p.export_prof);
+	ObservablesVec obs(p.nbSteps, DEFAULT_N_MOMENTS);
 
 	for (long s = 0 ; s < nbSimuls ; ++s) {
-		if (p.verbose) {
+		if (p.verbose || p.visu) {
 			std::cout << "Simulation " << s + 1 
 				<< " on thread " << std::this_thread::get_id() << std::endl;
 		}
@@ -76,6 +70,10 @@ void runMultipleSimulations(const Parameters &p, const long nbSimuls,
 
 		// Add the observables to the sum
 		sumObs.add(obs);
+
+		if (p.visu) {
+			std::cout << std::endl;
+		}
 	}
 
 	vslDeleteStream(&stream);
@@ -91,52 +89,23 @@ void runOneSimulation(const Parameters &p, ObservablesVec &obs,
 	double scalet = 1.0 / p.nbParticles;
 	double times[BATCH_SIZE];
 	int indices[BATCH_SIZE];
-	int dirs[BATCH_SIZE];
 	double us[BATCH_SIZE];
 
-	const bool biased = (p.probTP != DEFAULT_PROBA_RIGHT);
-	
 	// Positions of the tracers
 	State state(p);
-	if (p.determ) {
+	if (p.determ)  {
 		state.init_determ();
-	} else if (p.stat) {
-		state.init_stat(stream);
 	} else {
 		state.init(stream);
 	}
 
-	// Thermalization
-	while (t < p.duration_therm) {
-		vdRngExponential(VSL_RNG_METHOD_EXPONENTIAL_ICDF, stream, BATCH_SIZE,
-				         times, 0.0, scalet);
-		viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream, BATCH_SIZE, indices,
-					 0, p.nbParticles);
-		vdRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream, BATCH_SIZE, us,
-				     0.0, 1.0);
-		viRngBernoulli(VSL_RNG_METHOD_BERNOULLI_ICDF, stream, BATCH_SIZE,
-					   dirs, DEFAULT_PROBA_RIGHT);
-
-		for (int i = 0 ; i < BATCH_SIZE ; ++i) {
-			// If the TP is selected and is biased we redraw the direction
-			if (biased && indices[i] == 0) {
-				viRngBernoulli(VSL_RNG_METHOD_BERNOULLI_ICDF, stream, 1,
-							   &dirs[i], p.probTP);
-			}
-			state.update(indices[i], us[i], dirs[i]);
-			t += times[i];
-			if (t >= p.duration_therm)
-				break;
-		}
-	}
-
-	tDiscrete = 0;
-	t = 0.;
-	state.reset();
-
 	// Compute the initial observables
 	obs[tDiscrete].fromState(state);
 	++tDiscrete;
+
+	if (p.visu) {
+		state.visualize(p, 0.);
+	}
 
 	// Loop over time
 	// Generation of the random numbers in batches
@@ -147,17 +116,14 @@ void runOneSimulation(const Parameters &p, ObservablesVec &obs,
 					 0, p.nbParticles);
 		vdRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream, BATCH_SIZE, us,
 				     0.0, 1.0);
-		viRngBernoulli(VSL_RNG_METHOD_BERNOULLI_ICDF, stream, BATCH_SIZE,
-					   dirs, DEFAULT_PROBA_RIGHT);
 
 		for (int i = 0 ; i < BATCH_SIZE ; ++i) {
-			// If the TP is selected and is biased we redraw the direction
-			if (biased && indices[i] == 0) {
-				viRngBernoulli(VSL_RNG_METHOD_BERNOULLI_ICDF, stream, 1,
-							   &dirs[i], DEFAULT_PROBA_RIGHT);
+			if (p.visu) {
+				state.visualize(p, t, indices[i]);
 			}
+
 			// Evolve
-			state.update(indices[i], us[i], dirs[i]);
+			state.update(indices[i], us[i]);
 			t += times[i];
 
 			while (t - tLast > p.dt && tDiscrete < p.nbSteps) {
@@ -173,13 +139,13 @@ void runOneSimulation(const Parameters &p, ObservablesVec &obs,
 
 // Export the observables to a file.
 int exportObservables(const ObservablesVec &sumObs, const Parameters &p) {
-	std::ofstream file(p.output + ".dat");
+	std::ofstream file(p.output);
 	if (!file.is_open()) {
 		return 1;
 	}
 
 	// Header
-	file << "# RAP_Profiles (" << __DATE__ <<  ", " << __TIME__ << "): ";
+	file << "# SEP_2D (" << __DATE__ <<  ", " << __TIME__ << "): ";
 	p.print(file);
 	file << "\n# t";
 	for (size_t i = 0 ; i < DEFAULT_N_MOMENTS ; ++i) {
@@ -197,37 +163,5 @@ int exportObservables(const ObservablesVec &sumObs, const Parameters &p) {
 	}
 
 	file.close();
-	return 0;
-}
-
-int exportProfiles(const ObservablesVec &sumObs, const Parameters &p) {
-	for (int i = 0 ; i < p.nbSteps ; ++i) {
-		double t = i * p.dt;
-		std::string fname = p.output + "_prof" + std::to_string(t) + ".dat";
-
-		std::ofstream file(fname);
-		if (!file.is_open()) {
-			return 1;
-		}
-
-		// Header
-		file << "# RAP_Profiles (" << __DATE__ <<  ", " << __TIME__ << "): ";
-		p.print(file);
-		file << "\n# x";
-		for (size_t i = 0 ; i < DEFAULT_N_MOMENTS ; ++i) {
-			file << " rho(x)*X^" << i;
-		}
-		file << "\n";
-		for (long j = 0 ; j < p.nbPtsProf ; ++j) {
-			file << j / ((double) p.nbPtsProfRel);
-			for (size_t k = 0 ; k < DEFAULT_N_MOMENTS ; ++k) {
-				file << " "
-					 << sumObs[i].getProfiles(k, j) * p.nbPtsProfRel / p.nbSimuls;
-			}
-		  	file << "\n";
-		}
-
-		file.close();
-	}
 	return 0;
 }

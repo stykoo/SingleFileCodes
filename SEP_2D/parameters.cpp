@@ -7,18 +7,18 @@ namespace po = boost::program_options;
 
 // Check if the parameters are valid. Return 0 if they are, 1 otherwise.
 int Parameters::check() const {
-	if (nbSites <= 0) {
-		std::cerr << "Error: nbSites should be strictly positive."
+	if (nbSitesX <= 0) {
+		std::cerr << "Error: nbSitesX should be strictly positive."
 			<< std::endl;
 		return 1;
 	}
-	if (rhoP < 0 || rhoP > 1) {
-		std::cerr << "Error: rhoP should be between 0 and 1."
+	if (nbSitesY <= 0) {
+		std::cerr << "Error: nbSitesY should be strictly positive."
 			<< std::endl;
 		return 1;
 	}
-	if (rhoM < 0 || rhoM > 1) {
-		std::cerr << "Error: rhoM should be between 0 and 1."
+	if (nbParticles <= 0) {
+		std::cerr << "Error: nbParticles should be strictly positive."
 			<< std::endl;
 		return 1;
 	}
@@ -37,54 +37,43 @@ int Parameters::check() const {
 			<< std::endl;
 		return 1;
 	}
-	if (determ) {
-		if ((rhoM <= 0.5 && std::floor(1/rhoM) != 1/rhoM)
-			|| (rhoM > 0.5 &&
-				std::abs(std::round(1/(1-rhoM))-1/(1-rhoM)) > 1e-6)) {
-			std::cerr << "Error: 1/rhoM or 1/(1-rhoM) should be an integer"
-				<< std::endl;
-			return 1;
-		}
-		if ((rhoP <= 0.5 && std::floor(1/rhoP) != 1/rhoP)
-			|| (rhoP > 0.5 &&
-				std::abs(std::round(1/(1-rhoP))-1/(1-rhoP)) > 1e-6)) {
-			std::cerr << "Error: 1/rhoP or 1/(1-rhoP) should be an integer"
-				<< std::endl;
-			return 1;
-		}
-	}
+	/*if (probTP < 0. || probTP > 1.) {
+		std::cerr << "Error: the probabilities should be between 0"
+			<< " and 1." << std::endl;
+		return 1;
+	}*/
 	return 0;
 }
 
 // Print the parameters to stream.
 void Parameters::print(std::ostream &stream) const {
-	stream << "sites=" << nbSites << ", rhoP=" << rhoP << ", rhoM=" << rhoM
-		<< ", duration=" << duration << ", simuls=" << nbSimuls;
-	if (rev)
-		stream << ", rev";
-	if (determ)
-		stream << ", determ";
+	stream << "sitesX=" << nbSitesX << ", sitesY=" << nbSitesY
+		<< ", particles=" << nbParticles
+		<< ", duration=" << duration << ", simuls=" << nbSimuls
+		//<< ", prob=" << probTP
+		<< ", determ=" << determ;
 }
 
 int Parameters::fromCommandLine(int argc, char **argv) {
 	po::options_description opts("Options");
 	opts.add_options()
-		("sites,n", po::value<long>(&nbSites)->required(), "Number of sites")
-		("rhoP", po::value<double>(&rhoP)->required(), "Density in front")
-		("rhoM", po::value<double>(&rhoM)->required(), "Density behind")
+		("sitesX,n", po::value<long>(&nbSitesX)->required(),
+		 "Number of sites in x direction")
+		("sitesY,m", po::value<long>(&nbSitesY)->required(),
+		 "Number of sites in y direction")
+		("particles,k", po::value<long>(&nbParticles)->required(),
+		 "Number of particles")
 		("duration,T", po::value<double>(&duration)->required(),
 		 "Duration of the simulation")
 		("dt,t", po::value<double>(&dt)->required(),
 		 "Timestep for export")
-        ("determ", po::bool_switch(&determ),
-		 "Deterministic initial conditions")
-        ("prof", po::bool_switch(&computeProfs),
-		 "Compute generalized profiles")
-		("sitesProf", po::value<long>(&nbSitesProf)->default_value(0),
-		 "Number of sites for profiles")
-        ("rev", po::bool_switch(&rev), "Compute (1-eta_1) eta_r, etc.")
 		("simuls,s", po::value<long>(&nbSimuls)->required(),
 		 "Number of repetitions of the simulation")
+		/*("prob,p", po::value<double>(&probTP)->default_value(
+		  DEFAULT_PROBA_RIGHT),
+		 "Probability for the TP to jump to the right.")*/
+        ("determ,D", po::bool_switch(&determ),
+		 "Deterministic initial conditions")
 		("threads,c", po::value<int>(&nbThreads)->default_value(
 			DEFAULT_THREADS), "Number of threads")
 		("output,o", po::value<std::string>(&output)->default_value(
@@ -109,7 +98,7 @@ int Parameters::fromCommandLine(int argc, char **argv) {
 
         po::notify(vars);
 
-		nbSteps = (long) (duration / dt);
+		nbSteps = (long) (duration / dt); // Number of timesteps
 	} catch (std::exception &e) {
 		std::cerr << "Error: " << e.what() << std::endl;
 		return 2;

@@ -7,7 +7,7 @@
 #include "parameters.h"
 #include "observables.h"
 
-#define BATCH_SIZE 256
+#define BATCH_SIZE 64
 // See https://software.intel.com/en-us/mkl-developer-reference-c-brng-parameter-definition
 #define CUSTOM_RNG VSL_BRNG_SFMT19937
 #define MIN(a,b) (((a)<(b))?(a):(b))
@@ -19,5 +19,6 @@ void runMultipleSimulations(const Parameters &p, const long nbSimuls,
 void runOneSimulation(const Parameters &p, ObservablesVec &obs,
    					  VSLStreamStatePtr stream);
 int exportObservables(const ObservablesVec &sumObs, const Parameters &p);
+int exportProfs(const ObservablesVec &sumObs, const Parameters &p);
 
 #endif

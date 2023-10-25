@@ -20,6 +20,28 @@ void State::init(VSLStreamStatePtr stream) {
 	reset();
 }
 
+void State::init_stat(VSLStreamStatePtr stream) {
+	positions.resize(nbParticles);
+	// aux is actually not necessary (everything can be done in positions)
+	aux.resize(nbParticles); 
+	vdRngGaussian(VSL_RNG_METHOD_GAUSSIAN_ICDF, stream, nbParticles,
+			      aux.data(), 0., 1.);
+
+	for (long i = 0 ; i < nbParticles ; ++i)
+		aux[i] *= aux[i];
+
+	double s = 0.;
+	for (long i = 0 ; i < nbParticles ; ++i)
+		s += aux[i];
+
+	positions[0] = 0.;
+	for (long i = 1 ; i < nbParticles ; ++i) {
+		positions[i] = positions[i-1] + length * aux[i-1] / s;
+	}
+
+	reset();
+}
+
 void State::init_determ() {
 	positions.resize(nbParticles);
 

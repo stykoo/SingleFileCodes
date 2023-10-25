@@ -10,9 +10,11 @@ struct State {
 	public:
 		void init(const Parameters &p, VSLStreamStatePtr stream);
 		void init_determ(const Parameters &p);
-		double update(const Parameters &p, double u, VSLStreamStatePtr stream);
+		//double update(const Parameters &p, double u, VSLStreamStatePtr stream);
+		void update(const Parameters &p, double u, int part);
 		void visualize(const Parameters &p, const double t);
-		long getX() const { return pos_tp; }
+		long getNbParts() const { return nbParts; }
+		long getX() const { return pos_tp; } 
 		int getOcc(const long i) const { return occupations[i]; }
 
 	protected:
