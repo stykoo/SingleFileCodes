@@ -139,11 +139,7 @@ int exportObservables(const ObservablesVec &sumObs, const Parameters &p) {
 	// Header
 	file << "# SF_ContTime (" << __DATE__ <<  ", " << __TIME__ << "): ";
 	p.print(file);
-	file << "\n# t";
-	for (size_t i = 0 ; i < DEFAULT_N_MOMS ; ++i) {
-			file << " x^" << i+1;
-	}
-	file << "\n";
+	file << "\n# t <d> <d^2> <d^2>-<d>^2\n";
 
 	file << std::scientific << std::setprecision(DEFAULT_OUTPUT_PRECISION);
 

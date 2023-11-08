@@ -26,6 +26,7 @@ struct Parameters {
 	bool determ; // Use deterministic initial conditions
 
 	long nbSimuls;  // Number of simulations
+	double proba;  // Probability to jump to the right
 	int nbThreads;  // Number of threads
 	std::string output;  // Name of the output file
 

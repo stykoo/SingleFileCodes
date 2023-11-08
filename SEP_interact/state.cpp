@@ -78,10 +78,7 @@ void State::init_determ() {
 void State::update(long part, double u) {
 	long pos = positions[part]; 
 
-	// Probability to jump to the right
-	double pr = DEFAULT_PROBA_RIGHT;
-
-	long d = 2 * (u < pr) - 1;
+	long d = 2 * (u < p.proba) - 1;
 	long pos_next = pos + d;
 	if (pos_next == p.nbSites)
 		pos_next = 0;

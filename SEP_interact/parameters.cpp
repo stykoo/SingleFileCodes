@@ -47,7 +47,8 @@ int Parameters::check() const {
 // Print the parameters to stream.
 void Parameters::print(std::ostream &stream) const {
 	stream << "sites=" << nbSites << ", particles=" << nbParticles
-		<< ", duration=" << duration << ", simuls=" << nbSimuls;
+		<< ", duration=" << duration << ", simuls=" << nbSimuls
+		<< ", p=" << proba << ", determ=" << determ;
 }
 
 int Parameters::fromCommandLine(int argc, char **argv) {
@@ -64,6 +65,8 @@ int Parameters::fromCommandLine(int argc, char **argv) {
 		 "Deterministic initial conditions")
 		("simuls,s", po::value<long>(&nbSimuls)->required(),
 		 "Number of repetitions of the simulation")
+		("proba,p", po::value<double>(&proba)->default_value(
+			DEFAULT_PROBA_RIGHT), "Probability to jump to the right")
 		("threads,c", po::value<int>(&nbThreads)->default_value(
 			DEFAULT_THREADS), "Number of threads")
 		("output,o", po::value<std::string>(&output)->default_value(

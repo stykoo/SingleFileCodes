@@ -6,7 +6,7 @@
 #include <string>
 #include "state.h"
 
-#define DEFAULT_N_MOMS 2
+#define DEFAULT_N_MOMS 3
 
 class Observables {
 	public:

@@ -9,7 +9,8 @@ void Observables::fromState(const State &state) {
 	double m = state.computeDispl();
 	double m2 = state.computeDisplSq();
 	moments[0] = m;
-	moments[1] = m2 - m * m;
+	moments[1] = m2;
+	moments[2] = m2 - m * m;
 }
 
 void Observables::add(const Observables &obs) {
