@@ -13,8 +13,6 @@ struct State {
 		void update(const Parameters &p, long part, double u);
 		void visualize(const Parameters &p, const double t);
 		long getXtp() const { return x_tp; }
-		//long getX(const long i) const { return positions[i]; }
-		//int getOcc(const long i) const { return occupations[i]; }
 
 	protected:
 		long x_tp;

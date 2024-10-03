@@ -29,6 +29,7 @@ struct Parameters {
 	std::string output;  // Name of the output file
 
 	double prob;  // Probabilities to jump to the right
+	bool determ;  // Deterministic initial conditions
 	
 	bool visu;  // Visualization
 	int sleep;  // Number of milliseconds between two visualizations

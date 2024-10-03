@@ -43,7 +43,7 @@ int Parameters::check() const {
 void Parameters::print(std::ostream &stream) const {
 	stream << "sites=" << nbSites << ", particles=" << nbParticles
 		<< ", duration=" << duration << ", simuls=" << nbSimuls
-		<< ", prob=" << prob;
+		<< ", prob=" << prob << ", determ=" << determ;
 }
 
 int Parameters::fromCommandLine(int argc, char **argv) {
@@ -61,6 +61,8 @@ int Parameters::fromCommandLine(int argc, char **argv) {
 		("prob,p",
 		 po::value<double>(&prob)->default_value(DEFAULT_PROBA_RIGHT),
 		 "Probabilities to jump to the right.")
+        ("determ,d", po::bool_switch(&determ),
+		 "Deterministic initial conditions")
 		("threads,c", po::value<int>(&nbThreads)->default_value(
 			DEFAULT_THREADS), "Number of threads")
 		("output,o", po::value<std::string>(&output)->default_value(

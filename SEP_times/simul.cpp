@@ -96,7 +96,11 @@ void runOneSimulation(const Parameters &p, Observables &obs,
 
 	// Initial state
 	State state;
-	state.init(p, stream);
+	if (p.determ) {
+		state.init_determ(p);
+	} else {
+		state.init(p, stream);
+	}
 
 	// Compute the initial observables
 	obs.recordPos(tDiscrete, 0);

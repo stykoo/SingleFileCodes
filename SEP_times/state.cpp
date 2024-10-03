@@ -40,6 +40,7 @@ void State::init(const Parameters &p, VSLStreamStatePtr stream) {
 }
 
 void State::init_determ(const Parameters &p) {
+	x_tp = 0;
 	positions.resize(p.nbParticles);
 	occupations.assign(p.nbSites, 0);
 
