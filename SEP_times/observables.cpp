@@ -1,3 +1,4 @@
+#include <iomanip>
 #include <string>
 #include <fstream>
 #include <cassert>
@@ -26,7 +27,7 @@ void Observables::computeMoments() {
 	}
 	// Three-point and four-point moments (with final time)
 	q = 0;
-	long long xf = mom1[n1-1];
+	long xf = mom1[n1-1];
 	for (long i = 0 ; i < n1 ; ++i) {
 		for (long j = 0 ; j <= i ; ++j) {
 			for (long k = 0 ; k <= j ; ++k) {
@@ -39,16 +40,10 @@ void Observables::computeMoments() {
 }
 
 void Observables::add(const Observables &obs) {
-	for (long i = 0 ; i < n1 ; ++i) {
-	mom1[i] += obs.mom1[i];
-	}
-	for (long i = 0 ; i < n2 ; ++i) {
-		mom2[i] += obs.mom2[i];
-	}
-	for (long i = 0 ; i < n3 ; ++i) {
-		mom3[i] += obs.mom3[i];
-		mom4[i] += obs.mom4[i];
-	}
+	add_arrays(mom1.data(), obs.mom1.data(), n1);
+	add_arrays(mom2.data(), obs.mom2.data(), n2);
+	add_arrays(mom3.data(), obs.mom3.data(), n3);
+	add_arrays(mom4.data(), obs.mom4.data(), n3);
 }
 
 int Observables::exportMoments(const Parameters &p) const {
@@ -111,4 +106,12 @@ int Observables::exportMoments(const Parameters &p) const {
 	file.close();
 
 	return 0;
+}
+
+void add_arrays(long *__restrict a, const long *__restrict b, long n) {
+	a = (long*)__builtin_assume_aligned(a, ALIGNMENT);
+	b = (long*)__builtin_assume_aligned(a, ALIGNMENT);
+	for (long i = 0 ; i < n ; ++i) {
+		a[i] += b[i];
+	}
 }
