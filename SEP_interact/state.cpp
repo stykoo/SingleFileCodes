@@ -77,8 +77,25 @@ void State::init_determ() {
 
 void State::update(long part, double u) {
 	long pos = positions[part]; 
+	double proba = p.proba;
 
-	long d = 2 * (u < p.proba) - 1;
+	// Jump probability if interactions (p.proba plays no role)
+	if (p.fleft != 0. || p.fright != 0.) {
+		long pos_p = pos + 1;
+		long pos_m = pos - 1;
+		if (pos_p == p.nbSites)
+			pos_p = 0;
+		if (pos_m == -1)
+			pos_m = p.nbSites - 1;
+
+		proba = 0.5 * (1.
+				+ p.fright * occupations[pos_m]
+				- p.fleft * occupations[pos_p]);
+		// Possible optimization: pos_next = pos_nbrs[u<proba];
+	}
+
+	// Next position
+	long d = 2 * (u < proba) - 1;
 	long pos_next = pos + d;
 	if (pos_next == p.nbSites)
 		pos_next = 0;

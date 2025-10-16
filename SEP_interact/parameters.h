@@ -26,7 +26,9 @@ struct Parameters {
 	bool determ; // Use deterministic initial conditions
 
 	long nbSimuls;  // Number of simulations
-	double proba;  // Probability to jump to the right
+	double proba;  // Probability to jump to the right (if no interactions)
+	double fleft; // Bias to the left if right neighbor is occupied
+	double fright; // Bias to the right if left neighbor is occupied
 	int nbThreads;  // Number of threads
 	std::string output;  // Name of the output file
 

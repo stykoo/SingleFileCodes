@@ -3,9 +3,10 @@
 # https://software.intel.com/content/www/us/en/develop/articles/intel-mkl-link-line-advisor.html
 
 # Debian with package intel-mkl
-MKLROOT=/opt/intel/mkl/
+MKLROOT=/opt/intel/oneapi/mkl/latest
 MKL_CFLAGS=-DMKL_ILP64 -m64 -I${MKLROOT}/include
-MKL_LDFLAGS=${MKLROOT}/lib/libmkl_intel_ilp64.a ${MKLROOT}/lib/libmkl_sequential.a ${MKLROOT}/lib/libmkl_core.a -lm -ldl
+# MKL_LDFLAGS=${MKLROOT}/lib/libmkl_intel_ilp64.a ${MKLROOT}/lib/libmkl_sequential.a ${MKLROOT}/lib/libmkl_core.a -lm -ldl
+MKL_LDFLAGS=-m64  -Wl,--start-group ${MKLROOT}/lib/libmkl_intel_ilp64.a ${MKLROOT}/lib/libmkl_sequential.a ${MKLROOT}/lib/libmkl_core.a -Wl,--end-group -lpthread -lm -ldl
 ### END MKL ###
 
 CC=g++

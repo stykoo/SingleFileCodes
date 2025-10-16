@@ -47,8 +47,13 @@ int Parameters::check() const {
 // Print the parameters to stream.
 void Parameters::print(std::ostream &stream) const {
 	stream << "sites=" << nbSites << ", particles=" << nbParticles
-		<< ", duration=" << duration << ", simuls=" << nbSimuls
-		<< ", p=" << proba << ", determ=" << determ;
+		<< ", duration=" << duration << ", simuls=" << nbSimuls;
+	if (fleft == 0. && fright == 0.) {
+		stream  << ", p=" << proba;
+	} else {
+		stream  << ", fleft=" << fleft << ", fright=" << fright;
+	}
+	stream << ", determ=" << determ;
 }
 
 int Parameters::fromCommandLine(int argc, char **argv) {
@@ -67,6 +72,10 @@ int Parameters::fromCommandLine(int argc, char **argv) {
 		 "Number of repetitions of the simulation")
 		("proba,p", po::value<double>(&proba)->default_value(
 			DEFAULT_PROBA_RIGHT), "Probability to jump to the right")
+		("fleft", po::value<double>(&fleft)->default_value(0.),
+		 "Bias to the left if right neighbor is occupied")
+		("fright", po::value<double>(&fright)->default_value(0.),
+		 "Bias to the right if left neighbor is occupied")
 		("threads,c", po::value<int>(&nbThreads)->default_value(
 			DEFAULT_THREADS), "Number of threads")
 		("output,o", po::value<std::string>(&output)->default_value(
