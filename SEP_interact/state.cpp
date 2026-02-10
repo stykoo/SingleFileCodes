@@ -6,7 +6,7 @@
 #include <thread>
 #include "state.h"
 
-State::State(const Parameters &_p, VSLStreamStatePtr stream) : p(_p) {
+State::State(const Parameters &_p, VSLStreamStatePtr stream) : p(_p), current(0) {
 	positions.resize(p.nbParticles);
 	displacements.assign(p.nbParticles, 0);
 	occupations.assign(p.nbSites, 0);
@@ -108,6 +108,12 @@ void State::update(long part, double u) {
 	displacements[part] += (1 - o) * d; // Add the displacement
 	occupations[pos] = o; // Occupied only if doesn't move
 	occupations[pos_next] = 1; // Next site is occupied anyways
+    
+    if (pos == 0 && pos_next == 1 && o == 0) {
+        current++;
+    } else if (pos == 1 && pos_next == 0 && o == 0) {
+        current--;
+    }
 }
 
 double State::computeDispl() const {

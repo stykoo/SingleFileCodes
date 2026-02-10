@@ -16,12 +16,14 @@ struct State {
 		void visualize(const double t);
 		int getOcc(const long i) const { return occupations[i]; }
 		long getDispl(const long i) const { return displacements[i]; }
+		long getCurrent() const { return current; }
 
 	protected:
 		const Parameters p;
 		std::vector<long> positions;  // Positions of the particles
 		std::vector<long> displacements;  // Displacements of the particles
 		std::vector<int> occupations;  // Occupations of the sites
+        long current;
 };
 
 #endif

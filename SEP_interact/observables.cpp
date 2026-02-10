@@ -8,9 +8,12 @@ Observables::Observables() {
 void Observables::fromState(const State &state) {
 	double m = state.computeDispl();
 	double m2 = state.computeDisplSq();
+	double j = (double) state.getCurrent();
 	moments[0] = m;
 	moments[1] = m2;
 	moments[2] = m2 - m * m;
+	moments[3] = j;
+	moments[4] = j * j;
 }
 
 void Observables::add(const Observables &obs) {
